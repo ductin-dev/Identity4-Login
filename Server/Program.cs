@@ -1,11 +1,23 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Server;
 using Server.Data;
+
+var seed = args.Contains("/seed");
+if (seed)
+{
+    args = args.Except(new[] { "/seed" }).ToArray();
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
 var assembly = typeof(Program).Assembly.GetName().Name;
 var connectString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+if (seed)
+{
+    SeedData.EnsureSeedData(connectString);
+}
 
 builder.Services.AddDbContext<AspNetIdentityDbContext>(options=>
     options.UseSqlServer(connectString,b=>b.MigrationsAssembly(assembly)));
